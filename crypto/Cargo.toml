@@ -1,0 +1,25 @@
+# /var/www/structure/crypto/Cargo.toml
+[package]
+name = "crypto"
+version = "0.1.0"
+edition = "2024"
+
+[lib]
+crate-type = ["cdylib", "rlib"] # cdylib для WASM, rlib для тестов
+
+[dependencies]
+# Основа для WASM
+wasm-bindgen = "0.2"
+
+# Криптография (ECDH + AES)
+p256 = { version = "0.13", features = ["ecdh"] }
+aes-gcm = "0.10"
+
+# Шифрование на основе пароля (PBKDF2)
+pbkdf2 = { version = "0.12", features = ["simple"] }
+
+# Утилиты
+base64ct = { version = "1.6", features = ["alloc"] }
+elliptic-curve = { version = "0.13", features = ["sec1"] }
+rand = "0.8"
+getrandom = { version = "0.2", features = ["js"] }

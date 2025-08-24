@@ -1,0 +1,7 @@
+# /var/www/structure/Cargo.toml
+[workspace]
+members = [
+    "server",
+    "crypto",
+]
+resolver = "2"
