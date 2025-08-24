@@ -1,37 +1,55 @@
 // /server/src/handlers/location_handler.rs
-use crate::{auth::Claims, error::AppError, models::location::Location, state::AppState};
+use crate::{
+    auth::Claims,
+    error::AppError,
+    // Добавляем LocationLink
+    models::{location::Location, link::LocationLink},
+    state::AppState,
+};
+
 use axum::{
     extract::{Path, Query, State},
     Extension, Json,
 };
-use serde::Deserialize;
+use serde::{Deserialize, Serialize};
 use uuid::Uuid;
+
+
 
 #[derive(Deserialize)]
 pub struct AccessQuery {
     access_level: Option<i32>,
 }
 
+#[derive(Serialize)]
+pub struct LocationResponse {
+    location: Location,
+    links: Vec<LocationLink>,
+}
+
 pub async fn get_location(
     State(state): State<AppState>,
-    Extension(claims): Extension<Claims>, // Этот роут защищен
+    Extension(claims): Extension<Claims>,
     Path(id): Path<Uuid>,
-    Query(query): Query<AccessQuery>,
-) -> Result<Json<Location>, AppError> {
+    Query(_query): Query<AccessQuery>,
+) -> Result<Json<LocationResponse>, AppError> {
     tracing::debug!("Запрос локации {} для пользователя {}", id, claims.sub);
 
+    // Получаем данные о самой локации
     let location = sqlx::query_as!(
         Location,
         "SELECT * FROM locations WHERE id = $1",
         id
-    )
-    .fetch_one(&state.pool)
-    .await?;
+    ).fetch_one(&state.pool).await?;
 
-    let player_access_level = query.access_level.unwrap_or(0);
+    // Получаем доступные переходы из этой локации
+    let links = sqlx::query_as!(
+        LocationLink,
+        "SELECT target_location_id, link_text, required_access_level FROM location_links WHERE source_location_id = $1",
+        id
+    ).fetch_all(&state.pool).await?;
+    
+    // TODO: Проверять access_level и security_level
 
-    // TODO: Реализовать логику "зашифрованной" локации, если player_access_level < location.security_level
-    // Пока что просто отдаем локацию как есть.
-
-    Ok(Json(location))
+    Ok(Json(LocationResponse { location, links }))
 }

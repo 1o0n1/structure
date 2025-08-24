@@ -10,6 +10,7 @@ pub fn create_router(app_state: AppState) -> Router {
     // --- РАСКОММЕНТИРУЕМ И НАСТРАИВАЕМ ---
     let protected_routes = Router::new()
         .route("/player/status", get(player_handler::get_player_status))
+        .route("/player/move", post(player_handler::move_player)) 
         .route("/locations/:id", get(location_handler::get_location))
         .layer(middleware::from_fn_with_state(
             app_state.clone(),

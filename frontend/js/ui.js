@@ -1,5 +1,5 @@
 // /frontend/js/ui.js
-
+import { handleAction } from './auth.js';
 // Находим все элементы один раз
 export const dom = {
     authView: document.getElementById('auth-view'),
@@ -43,7 +43,8 @@ export function updatePlayerStatus(player, claims) {
     dom.playerAccessLevel.innerText = player.access_level;
 }
 
-export function updateLocationUI(location) {
+export function updateLocationUI(response) {
+    const { location, links } = response;
     dom.locationName.innerText = location.name;
     dom.locationDescription.innerText = location.description;
     if (location.image_url) {
@@ -52,6 +53,19 @@ export function updateLocationUI(location) {
     } else {
         dom.locationImage.style.display = 'none';
     }
-    dom.actionList.innerHTML = '<li>[ NO ACTIONS AVAILABLE ]</li>';
+    dom.actionList.innerHTML = ''; // Очищаем старые действия
+    if (links && links.length > 0) {
+        links.forEach(link => {
+            const li = document.createElement('li');
+            li.innerText = link.link_text;
+            li.dataset.targetId = link.target_location_id; // Сохраняем ID цели
+            li.addEventListener('click', () => handleAction(link.target_location_id));
+            dom.actionList.appendChild(li);
+        });
+    } else {
+        dom.actionList.innerHTML = '<li>[ NO ACTIONS AVAILABLE ]</li>';
+    }
+
     log(`Successfully loaded location: ${location.name}`);
 }
+

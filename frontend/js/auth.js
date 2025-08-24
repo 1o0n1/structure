@@ -86,3 +86,14 @@ function getAuthInput() {
         password: dom.passwordInput.value,
     };
 }
+
+export async function handleAction(targetLocationId) {
+    log(`Executing action: move to ${targetLocationId}...`);
+    try {
+        await api.movePlayer(targetLocationId);
+        // После успешного перемещения просто перезагружаем всё состояние
+        await initializeTerminal();
+    } catch (error) {
+        log(`Action failed: ${error.message}`);
+    }
+}

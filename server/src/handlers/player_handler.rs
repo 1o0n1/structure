@@ -1,6 +1,8 @@
 // /server/src/handlers/player_handler.rs
 use crate::{auth::Claims, error::AppError, models::player::Player, state::AppState};
 use axum::{extract::State, Extension, Json};
+use serde::Deserialize;
+use uuid::Uuid;
 
 // Этот хендлер будет доступен только аутентифицированным пользователям
 pub async fn get_player_status(
@@ -16,4 +18,27 @@ pub async fn get_player_status(
     .await?;
 
     Ok(Json(player))
+}
+
+#[derive(Deserialize)]
+pub struct MovePayload {
+    pub target_location_id: Uuid,
+}
+
+pub async fn move_player(
+    State(state): State<AppState>,
+    Extension(claims): Extension<Claims>,
+    Json(payload): Json<MovePayload>,
+) -> Result<(), AppError> {
+    // TODO: Проверить, что переход из текущей локации в целевую вообще возможен!
+
+    sqlx::query!(
+        "UPDATE players SET current_location_id = $1 WHERE user_id = $2",
+        payload.target_location_id,
+        claims.sub
+    )
+    .execute(&state.pool)
+    .await?;
+
+    Ok(()) // Возвращаем пустой успешный ответ
 }
