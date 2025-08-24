@@ -1,54 +1,76 @@
+<!-- /var/www/structure/frontend/index.html -->
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <title>Cyb3ria Secure Messenger</title>
-    <style>
-        body { font-family: monospace; background: #0a0a0a; color: #00ff00; max-width: 600px; margin: 20px auto; }
-        input, button, textarea { background: #222; color: #00ff00; border: 1px solid #00ff00; padding: 8px; margin: 5px 0; font-family: monospace; }
-        button { cursor: pointer; }
-        #log { border: 1px dashed #555; padding: 10px; height: 100px; overflow-y: scroll; margin-top: 20px; word-break: break-all; }
-        /* --- НОВЫЙ СТИЛЬ ДЛЯ УВЕДОМЛЕНИЙ --- */
-        .notification-badge {
-            color: #ff00ff; /* Яркий фиолетовый/розовый цвет */
-            font-weight: bold;
-            margin-left: 8px; /* Небольшой отступ от имени */
-        }
-        
-    </style>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>STRUCTURE :: EXPLORATION TERMINAL</title>
+    <link rel="icon" href="/favicon.ico" type="image/x-icon">
+    <link rel="stylesheet" href="terminal.css">
 </head>
 <body>
-    <h1>Cyb3ria Secure Messenger</h1>
 
-    <div id="auth-view">
-        <h2>Login / Register</h2>
-        <input type="email" id="email" placeholder="Email">
-        <input type="text" id="username" placeholder="Username (for registration)">
-        <input type="password" id="password" placeholder="Password">
-        <br>
-        <button id="register-btn">Register</button>
-        <button id="login-btn">Login</button>
-    </div>
-    
-   <div id="chat-view" style="display: none;">
-    <!-- НОВОЕ: Кнопка выхода -->
-    <h2>Your Secure Channel (<span id="current-user-name" style="color: #00ffff;"></span>) <button id="logout-btn" style="float: right;">Logout</button></h2>
-    <div style="display: flex;">
-        <div id="user-list" style="width: 30%; border-right: 1px solid #00ff00; padding-right: 10px; height: 250px; overflow-y: auto;">
-            <h3>Contacts</h3>
-        </div>
-        <div id="message-area" style="width: 70%; padding-left: 10px;">
-            <h3>Messages with <span id="current-chat-user">...</span></h3>
-            <div id="message-list" style="height: 200px; overflow-y: scroll; border: 1px solid #555; padding: 5px; word-break: break-word;">
+    <!-- Экран аутентификации (изначально виден) -->
+    <div id="auth-view" class="view-container">
+        <div class="terminal-window auth-box">
+            <div class="header">[ SYSTEM AUTHENTICATION ]</div>
+            <input type="email" id="email" placeholder="Operator Email" autocomplete="email">
+            <input type="text" id="username" placeholder="Operator ID (for registration)" autocomplete="username">
+            <input type="password" id="password" placeholder="Password" autocomplete="current-password">
+            <div class="auth-buttons">
+                <button id="register-btn">> REGISTER</button>
+                <button id="login-btn">> LOGIN</button>
             </div>
-            <textarea id="message-input" placeholder="Type an encrypted message..." style="width: 95%; margin-top: 10px;" rows="2"></textarea>
-            <button id="send-btn">Send Secure</button>
         </div>
     </div>
-</div>
 
-    <div id="log"></div>
-    <!-- ИЗМЕНЕНИЕ: Путь к JS и WASM теперь относительный -->
+    <!-- Главный игровой экран (изначально скрыт) -->
+    <main id="terminal-view" class="view-container" style="display: none;">
+        
+        <!-- Левая колонка -->
+        <aside class="left-column">
+            <section id="player-status-module" class="terminal-window">
+                <div class="header">[ OPERATOR: <span id="player-username">...</span> ]</div>
+                <p>STATUS: <span class="status-ok">ONLINE</span></p>
+                <p>ROLE: <span id="player-role">...</span></p>
+                <p>ACCESS LVL: <span id="player-access-level">...</span></p>
+                <button id="logout-btn" class="logout-button">> DISCONNECT</button>
+            </section>
+            <section id="scanner-module" class="terminal-window">
+                <div class="header">[ LOCAL TOPOLOGY SCANNER ]</div>
+                <pre id="map-display">[ NO DATA ]</pre>
+            </section>
+        </aside>
+
+        <!-- Центральная колонка -->
+        <div class="center-column">
+            <section id="image-module" class="image-viewport">
+                <img id="location-image" src="" alt="Visual feed offline.">
+            </section>
+            <section id="description-module" class="terminal-window">
+                <div class="header">[ LOCATION: <span id="location-name">...</span> ]</div>
+                <p id="location-description">Establishing connection...</p>
+            </section>
+        </div>
+
+        <!-- Правая колонка -->
+        <aside class="right-column">
+            <section id="actions-module" class="terminal-window">
+                <div class="header">[ AVAILABLE ACTIONS ]</div>
+                <ul id="action-list">
+                    <!-- Действия будут добавлены сюда динамически -->
+                </ul>
+            </section>
+            <section id="log-module" class="terminal-window">
+                <div class="header">[ SYSTEM LOG ]</div>
+                <div id="log-content">
+                    <!-- Логи будут добавляться сюда -->
+                </div>
+            </section>
+        </aside>
+
+    </main>
+
     <script src="main.js" type="module"></script>
 </body>
 </html>

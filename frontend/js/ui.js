@@ -1,0 +1,57 @@
+// /frontend/js/ui.js
+
+// Находим все элементы один раз
+export const dom = {
+    authView: document.getElementById('auth-view'),
+    terminalView: document.getElementById('terminal-view'),
+    emailInput: document.getElementById('email'),
+    usernameInput: document.getElementById('username'),
+    passwordInput: document.getElementById('password'),
+    registerBtn: document.getElementById('register-btn'),
+    loginBtn: document.getElementById('login-btn'),
+    logoutBtn: document.getElementById('logout-btn'),
+    playerUsername: document.getElementById('player-username'),
+    playerRole: document.getElementById('player-role'),
+    playerAccessLevel: document.getElementById('player-access-level'),
+    locationImage: document.getElementById('location-image'),
+    locationName: document.getElementById('location-name'),
+    locationDescription: document.getElementById('location-description'),
+    actionList: document.getElementById('action-list'),
+    logContent: document.getElementById('log-content'),
+};
+
+export function log(message) {
+    const logEntry = document.createElement('p');
+    logEntry.innerHTML = `> ${message}`;
+    dom.logContent.appendChild(logEntry);
+    dom.logContent.scrollTop = dom.logContent.scrollHeight;
+}
+
+export function showAuthView() {
+    dom.authView.style.display = 'flex';
+    dom.terminalView.style.display = 'none';
+}
+
+export function showTerminalView() {
+    dom.authView.style.display = 'none';
+    dom.terminalView.style.display = 'grid';
+}
+
+export function updatePlayerStatus(player, claims) {
+    dom.playerUsername.innerText = claims?.username || 'UNKNOWN';
+    dom.playerRole.innerText = claims?.role || 'UNKNOWN';
+    dom.playerAccessLevel.innerText = player.access_level;
+}
+
+export function updateLocationUI(location) {
+    dom.locationName.innerText = location.name;
+    dom.locationDescription.innerText = location.description;
+    if (location.image_url) {
+        dom.locationImage.src = location.image_url;
+        dom.locationImage.style.display = 'block';
+    } else {
+        dom.locationImage.style.display = 'none';
+    }
+    dom.actionList.innerHTML = '<li>[ NO ACTIONS AVAILABLE ]</li>';
+    log(`Successfully loaded location: ${location.name}`);
+}
