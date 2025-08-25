@@ -1,12 +1,13 @@
 // /var/www/structure/server/src/ws/state.rs
 
 use axum::extract::ws::Message;
+use crate::models::user::PublicUser;
 use std::{collections::HashMap, sync::Arc};
 use tokio::sync::Mutex;
 use uuid::Uuid;
 
 // Клиент: его имя и канал для отправки сообщений
-pub type Client = (String, tokio::sync::mpsc::UnboundedSender<Message>);
+pub type Client = (PublicUser, tokio::sync::mpsc::UnboundedSender<Message>);
 // Комната: user_id -> Client
 pub type Room = HashMap<Uuid, Client>;
 

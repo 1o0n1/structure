@@ -71,16 +71,32 @@ export function updateLocationUI(response) {
 }
 
 export function updatePresenceList(users) {
-    console.log('UI_LOG: updatePresenceList called with users:', users);
-    dom.presenceList.innerHTML = ''; // Очищаем список
+    dom.presenceList.innerHTML = '';
     if (users && users.length > 0) {
-        users.forEach(username => {
+        users.forEach(user => {
             const li = document.createElement('li');
-            li.innerText = `> ${username}`;
+            li.innerText = `> ${user.username}`;
+            li.style.cursor = 'pointer'; // Делаем курсор "рукой"
+            // Сохраняем все данные пользователя в data-атрибутах
+            li.dataset.userId = user.id;
+            li.dataset.username = user.username;
+            li.dataset.publicKey = user.public_key || ''; // Сохраняем ключ
+            li.dataset.role = user.role;
+            
+            // Вешаем обработчик клика
+            li.addEventListener('click', () => {
+                // Пока просто выводим инфо в лог
+                log(`--- OPERATOR INFO ---`);
+                log(`ID: ${user.id}`);
+                log(`ROLE: ${user.role}`);
+                log(`PUBLIC KEY: ${user.public_key ? 'Available' : 'Not set'}`);
+                log(`---------------------`);
+                // TODO: Открыть окно чата или профиля
+            });
+
             dom.presenceList.appendChild(li);
         });
     } else {
         dom.presenceList.innerHTML = '<li>[ NO OTHER SIGNALS DETECTED ]</li>';
     }
 }
-

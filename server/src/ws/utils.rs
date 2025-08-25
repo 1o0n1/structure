@@ -1,7 +1,7 @@
 // /var/www/structure/server/src/ws/utils.rs
 
 use super::state::Room;
-use crate::{state::AppState, auth::Claims};
+use crate::{auth::Claims, models::user::PublicUser, state::AppState};
 use axum::extract::ws::Message;
 use uuid::Uuid;
 
@@ -41,17 +41,22 @@ pub async fn change_room(
     if let Some(client_data) = client_tuple {
         let room = rooms.entry(new_room_id).or_default();
         
-        let current_users: Vec<String> = room.values().map(|(name, _)| name.clone()).collect();
+        let current_users: Vec<&PublicUser> = room.values().map(|(user, _)| user).collect();
+        
         let room_state_msg = serde_json::to_string(&serde_json::json!({
-            "type": "room_state",
-            "users": current_users,
+            "type": "room_state", "users": current_users,
         })).unwrap_or_default();
         let _ = client_data.1.send(Message::Text(room_state_msg));
 
-        let join_msg = format!(r#"{{"type": "user_joined", "username": "{}"}}"#, &claims.username);
+        let join_msg = serde_json::to_string(&serde_json::json!({
+            "type": "user_joined", "user": &client_data.0,
+        })).unwrap_or_default();
         broadcast_message(room, join_msg, Uuid::nil());
         room.insert(claims.sub, client_data);
     } else {
-        tracing::warn!("Не удалось переместить WS-клиента {}, так как он не найден в старой комнате.", &claims.username);
+        tracing::warn!(
+            "Не удалось переместить WS-клиента {}, так как он не найден в старой комнате.",
+            &claims.username
+        );
     }
 }

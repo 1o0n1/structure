@@ -98,19 +98,19 @@ function handleIncomingMessage(data) {
             break;
         case 'user_joined':
             // Добавляем нового, если его еще нет
-            if (!updatedUsers.includes(data.username)) {
-                updatedUsers.push(data.username);
+            if (!presentUsers.some(u => u.id === data.user.id)) {
+                presentUsers.push(data.user);
             }
-            log(`Operator "${data.username}" connected to your location.`);
+            log(`Operator "${data.user.username}" connected.`);
             break;
         case 'user_left':
-            // Убираем вышедшего
-            updatedUsers = updatedUsers.filter(name => name !== data.username);
-            log(`Operator "${data.username}" disconnected from your location.`);
+            // Сервер прислал ID и имя ушедшего
+            presentUsers = presentUsers.filter(u => u.id !== data.user_id);
+            log(`Operator "${data.username}" disconnected.`);
             break;
         default:
             log(`Unknown WS message type: ${data.type}`);
-            return; // Ничего не обновляем
+            return;
     }
     
     // Вызываем обновление UI с финальным, обновленным списком

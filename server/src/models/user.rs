@@ -27,3 +27,11 @@ pub struct User {
     pub created_at: DateTime<Utc>,
     pub updated_at: DateTime<Utc>,
 }
+
+#[derive(Debug, Serialize, Clone)]
+pub struct PublicUser {
+    pub id: Uuid,
+    pub username: String,
+    pub public_key: Option<String>,
+    pub role: UserRole,
+}
