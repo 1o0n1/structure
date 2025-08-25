@@ -3,6 +3,7 @@ import { api } from './api.js';
 import { dom, log, showAuthView, showTerminalView, updatePlayerStatus, updateLocationUI } from './ui.js';
 import { state, saveSession, loadSession, clearSession } from './state.js';
 import { generate_keypair_base64, encrypt_with_password, decrypt_with_password } from '../pkg/crypto.js';
+import { connectWebSocket } from './ws.js';
 
 export function checkAuthState() {
     loadSession();
@@ -73,6 +74,9 @@ async function initializeTerminal() {
             const location = await api.getLocation(player.current_location_id, player.access_level);
             updateLocationUI(location);
         }
+        
+         connectWebSocket();
+
     } catch (error) {
         log(`Session Error: ${error.message}`);
         handleLogout();

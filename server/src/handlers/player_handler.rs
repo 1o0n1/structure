@@ -1,5 +1,5 @@
 // /server/src/handlers/player_handler.rs
-use crate::{auth::Claims, error::AppError, models::{player::Player, location::Location}, state::AppState};
+use crate::{auth::Claims, error::AppError, models::{player::Player, location::Location}, state::AppState, ws};
 use axum::{extract::State, Extension, Json, http::StatusCode};
 use serde::Deserialize;
 use uuid::Uuid;
@@ -40,23 +40,40 @@ pub async fn move_player(
     
     // 3. Проверяем, достаточно ли у игрока прав доступа
     if player.access_level < target_location.security_level {
-        tracing::warn!("Попытка несанкционированного доступа от {} к локации {}", claims.sub, target_location.id);
-        // Возвращаем ошибку. На фронте это попадет в catch.
-        return Err(AppError::Unauthorized); 
+        tracing::warn!(
+            "Попытка несанкционированного доступа от {} к локации {}",
+            claims.sub,
+            target_location.id
+        );
+        return Err(AppError::Unauthorized);
     }
 
+    // --- НАЧАЛО ИЗМЕНЕНИЙ ---
+
+    // Запоминаем ID старой локации для передачи в change_room
     let old_location_id = player.current_location_id;
 
+    // Обновляем позицию игрока в базе данных
     sqlx::query!(
         "UPDATE players SET current_location_id = $1 WHERE user_id = $2",
         payload.target_location_id,
         claims.sub
-    ).execute(&state.pool).await?;
+    )
+    .execute(&state.pool)
+    .await?;
 
-  //      if let Some(old_id) = old_location_id {
-  //      ws::broadcast_leave(&state.ws_state, old_id, &claims.username).await;
-  //      }
-  //      ws::broadcast_join(&state.ws_state, payload.target_location_id, &claims.username).await;
+    // Вызываем единую функцию для обновления состояния WebSocket.
+    // Она сама позаботится о рассылке уведомлений о выходе и входе.
+    ws::change_room(
+        &state,
+        claims.sub,
+        &claims.username,
+        old_location_id,
+        payload.target_location_id,
+    )
+    .await;
+
+    // --- КОНЕЦ ИЗМЕНЕНИЙ ---
 
     Ok(StatusCode::NO_CONTENT)
 }

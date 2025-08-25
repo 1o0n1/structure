@@ -31,3 +31,6 @@ jsonwebtoken = "9"
 # Утилиты
 chrono = { version = "0.4", features = ["serde"] }
 querystring = "1.1.0"
+
+axum-extra = { version = "0.9", features = ["typed-header"] }
+tokio-stream = "0.1"

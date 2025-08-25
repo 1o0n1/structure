@@ -19,9 +19,11 @@ mod handlers;
 mod models;
 mod routes;
 mod state;
+pub mod ws;
 
 use config::Config;
 use state::AppState;
+use ws::WsState;
 
 #[tokio::main]
 async fn main() {
@@ -38,7 +40,11 @@ async fn main() {
     let config = Config::from_env();
     let pool: PgPool = db::connect_db(&config.database_url).await;
 
-    let app_state = AppState { pool, config };
+    let app_state = AppState { 
+        pool, 
+        config,  
+        ws_state: WsState::new(), 
+    };
 
     let cors = CorsLayer::new().allow_origin(Any).allow_headers(vec![
         axum::http::header::AUTHORIZATION,

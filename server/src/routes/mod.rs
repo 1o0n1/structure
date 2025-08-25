@@ -1,5 +1,5 @@
 // /server/src/routes/mod.rs
-use crate::{auth::auth_middleware, handlers::{user_handler, player_handler, location_handler}, state::AppState};
+use crate::{auth::auth_middleware, handlers::{user_handler, player_handler, location_handler}, state::AppState, ws};
 use axum::{middleware, routing::{get, post}, Router}; // Возвращаем get и middleware
 
 pub fn create_router(app_state: AppState) -> Router {
@@ -19,6 +19,7 @@ pub fn create_router(app_state: AppState) -> Router {
 
     Router::new()
         .merge(public_routes)
-        .merge(protected_routes) // <-- ОБЪЕДИНЯЕМ
+        .merge(protected_routes)
+        .route("/ws", get(ws::ws_handler))
         .with_state(app_state)
 }
