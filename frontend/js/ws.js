@@ -1,6 +1,6 @@
 // /frontend/js/ws.js
+import { log, updatePresenceList, dom } from './ui.js';
 import { state } from './state.js';
-import { log } from './ui.js';
 
 const API_URL = `${window.location.origin}/api`;
 let webSocket = null;
@@ -83,14 +83,36 @@ export function connectWebSocket() {
 function handleIncomingMessage(data) {
     log(`WS << [${data.type}] Received`);
     
+    // Получаем текущий список пользователей из UI (самый надежный способ)
+    // Мы читаем DOM, чтобы получить актуальное состояние
+    const currentUsersOnScreen = Array.from(dom.presenceList.querySelectorAll('li'))
+                                       .map(li => li.innerText.replace('> ', ''))
+                                       .filter(name => !name.startsWith('[')); // Убираем "[ SCANNING... ]"
+    
+    let updatedUsers = [...currentUsersOnScreen]; // Создаем копию
+
     switch (data.type) {
+        case 'room_state':
+            // Просто заменяем текущий список на тот, что пришел от сервера
+            updatedUsers = data.users || [];
+            break;
         case 'user_joined':
+            // Добавляем нового, если его еще нет
+            if (!updatedUsers.includes(data.username)) {
+                updatedUsers.push(data.username);
+            }
             log(`Operator "${data.username}" connected to your location.`);
             break;
         case 'user_left':
+            // Убираем вышедшего
+            updatedUsers = updatedUsers.filter(name => name !== data.username);
             log(`Operator "${data.username}" disconnected from your location.`);
             break;
         default:
             log(`Unknown WS message type: ${data.type}`);
+            return; // Ничего не обновляем
     }
+    
+    // Вызываем обновление UI с финальным, обновленным списком
+    updatePresenceList(updatedUsers);
 }

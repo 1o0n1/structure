@@ -1,6 +1,6 @@
 // /var/www/structure/server/src/state.rs
 use crate::config::Config;
-use crate::ws::WsState;
+use crate::ws::state::WsState;
 use sqlx::PgPool;
 
 #[derive(Clone)]

@@ -18,6 +18,7 @@ export const dom = {
     locationDescription: document.getElementById('location-description'),
     actionList: document.getElementById('action-list'),
     logContent: document.getElementById('log-content'),
+    presenceList: document.getElementById('presence-list'),
 };
 
 export function log(message) {
@@ -67,5 +68,19 @@ export function updateLocationUI(response) {
     }
 
     log(`Successfully loaded location: ${location.name}`);
+}
+
+export function updatePresenceList(users) {
+    console.log('UI_LOG: updatePresenceList called with users:', users);
+    dom.presenceList.innerHTML = ''; // Очищаем список
+    if (users && users.length > 0) {
+        users.forEach(username => {
+            const li = document.createElement('li');
+            li.innerText = `> ${username}`;
+            dom.presenceList.appendChild(li);
+        });
+    } else {
+        dom.presenceList.innerHTML = '<li>[ NO OTHER SIGNALS DETECTED ]</li>';
+    }
 }
 

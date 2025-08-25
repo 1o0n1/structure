@@ -36,9 +36,12 @@
                 <p>ACCESS LVL: <span id="player-access-level">...</span></p>
                 <button id="logout-btn" class="logout-button">> DISCONNECT</button>
             </section>
-            <section id="scanner-module" class="terminal-window">
-                <div class="header">[ LOCAL TOPOLOGY SCANNER ]</div>
-                <pre id="map-display">[ NO DATA ]</pre>
+                <section id="scanner-module" class="terminal-window">
+                <div class="header">[ LOCAL PRESENCE SCANNER ]</div>
+                <!-- Было: <pre id="map-display">[ NO DATA ]</pre> -->
+                <ul id="presence-list">
+                    <li>[ SCANNING... ]</li>
+                </ul>
             </section>
         </aside>
 
